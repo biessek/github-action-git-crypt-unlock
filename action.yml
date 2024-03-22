@@ -1,0 +1,29 @@
+name: "GitHub Action to unlock git-crypt secrets"
+description: "Unlock git-crypt files"
+author: "Alessandro Biessek"
+branding:
+  icon: "unlock"
+  color: "green"
+runs:
+  using: "composite"
+  steps:
+    - name: Install git-crypt
+      run:   |
+         if [ "$RUNNER_OS" == "Linux" ]; then
+              apk --update add git-crypt git-lfs
+         elif [ "$RUNNER_OS" == "macOS" ]; then
+              brew list git-crypt &>/dev/null || brew install git-crypt;
+         else
+              echo "$RUNNER_OS not supported"
+              exit 1
+         fi
+      shell: bash
+    - name: Run unlock.sh
+      run: unlock.sh
+      shell: bash
+      env:
+        UNLOCK_KEY: ${{ inputs.unlock-key }}
+inputs:
+  unlock-key:  # id of input
+    description: 'key to unlock'
+    required: true    
